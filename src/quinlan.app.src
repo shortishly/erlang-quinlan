@@ -1,0 +1,12 @@
+{application, quinlan,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { quinlan_app, []}},
+  {env, []}
+ ]}.
