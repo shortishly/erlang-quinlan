@@ -58,13 +58,123 @@ sunburn_tree_test() ->
 		  {{hair,brown},none},
 		  {{hair,red},sunburned}], quinlan_id3:tree(sunburn_examples())).
 
+wmh_example() ->
+    [quinlan_id3:classify([{macd_is_bearish_divergence, BearishDivergence},
+			   {macd_is_bullish_divergence, BullishDivergence},
+			   {macd_trigger,Trigger},
+			   {macd_value,Value},
+			   {macd_value_vs_trigger, ValueVsTrigger},
+			   {macd_value_vs_zero,ValueVsZero},
+			   {price_close, Close},
+			   {price_high, High},
+			   {price_low, Low},
+			   {price_open, Open},
+			   {price_volume, Volume}], 
+			  Decision) || {BearishDivergence,
+					BullishDivergence,
+					Trigger,
+					Value,
+					ValueVsTrigger,
+					ValueVsZero,
+					Close,
+					High,
+					Low,
+					Open,
+					Volume,
+					Decision} <-  [{false,false,rising,rising,above,above,rising,rising,rising,rising,rising,neutral},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,neutral},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,neutral},
+						       {false,false,rising,rising,below,above,rising,rising,rising,rising,rising,neutral},
+						       {false,false,rising,rising,below,above,rising,rising,rising,rising,falling,neutral},
+						       {false,false,rising,rising,below,above,rising,rising,rising,rising,falling,neutral},
+						       {false,false,rising,rising,below,above,rising,rising,rising,rising,falling,neutral},
+						       {false,false,rising,rising,below,above,rising,rising,rising,rising,falling,neutral},
+						       {false,false,rising,rising,below,above,rising,rising,rising,rising,falling,neutral},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,sell},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,sell},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,sell},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,sell},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,sell},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,sell},
+						       {false,false,rising,rising,above,above,rising,rising,rising,rising,rising,sell},
+						       {false,false,rising,rising,below,above,rising,rising,rising,rising,rising,neutral}]].
+					 
 
-    
-    
-    
-	
-    
+wmh_15_test() ->
+    ?assertEqual([{{macd_value_vs_trigger,above},sell},
+		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(15, wmh_example()))).
+
+wmh_10_test() ->
+    ?assertEqual([{{macd_value_vs_trigger,above},sell},
+		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(10, wmh_example()))).
+
+wmh_5_test() ->
+    ?assertEqual([{{macd_value_vs_trigger,above},sell},
+		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(5, wmh_example()))).
+wmh_4_test() ->
+    ?assertEqual([{{macd_value_vs_trigger,above},sell},
+		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(4, wmh_example()))).
+
+wmh_3_test() ->
+    ?assertEqual([{{macd_value_vs_trigger,above},sell},
+		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(3, wmh_example()))).
+
+wmh_2_test() ->
+    ?assertEqual([{{macd_value_vs_trigger,above},[neutral,sell,sell,sell,sell,sell,sell,sell]},
+		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(2, wmh_example()))).
 
 
-    
-    
+
+
+adm_test() ->
+    ?assertEqual([[{buy,1},{neutral,1}],
+		  [{neutral,1}],
+		  [{neutral,1}],
+		  [{buy,1},{neutral,1}]], quinlan_id3:tree([{example,[{macd_is_bearish_divergence,true},
+				{macd_is_bullish_divergence,false},
+				{macd_trigger,falling},
+				{macd_value,falling},
+				{macd_value_vs_trigger,below},
+				{macd_value_vs_zero,below},
+				{price_close,rising},
+				{price_high,falling},
+				{price_low,rising},
+				{price_open,falling},
+				{price_volume,falling}],
+		       [{buy,1},{neutral,1}]},
+		      {example,[{macd_is_bearish_divergence,true},
+				{macd_is_bullish_divergence,false},
+				{macd_trigger,falling},
+				{macd_value,falling},
+				{macd_value_vs_trigger,below},
+				{macd_value_vs_zero,below},
+				{price_close,rising},
+				{price_high,falling},
+				{price_low,rising},
+				{price_open,rising},
+				{price_volume,falling}],
+		       [{neutral,1}]},
+		      {example,[{macd_is_bearish_divergence,true},
+				{macd_is_bullish_divergence,false},
+				{macd_trigger,falling},
+				{macd_value,falling},
+				{macd_value_vs_trigger,below},
+				{macd_value_vs_zero,below},
+				{price_close,rising},
+				{price_high,rising},
+				{price_low,rising},
+				{price_open,falling},
+				{price_volume,falling}],
+		       [{neutral,1}]},
+		      {example,[{macd_is_bearish_divergence,true},
+				{macd_is_bullish_divergence,false},
+				{macd_trigger,falling},
+				{macd_value,falling},
+				{macd_value_vs_trigger,below},
+				{macd_value_vs_zero,below},
+				{price_close,rising},
+				{price_high,rising},
+				{price_low,rising},
+				{price_open,rising},
+				{price_volume,falling}],
+		       [{buy,1},{neutral,1}]}])).

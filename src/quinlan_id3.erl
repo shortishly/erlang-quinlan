@@ -7,10 +7,13 @@ tree(Examples) ->
     tree(Examples, orddict:new()).
 
 tree([#example{classification = Classification} | _] = Examples, Tree) ->
-    case entropy(Examples) of
-	0.0 ->
+    case {entropy(Examples), lists:sum([gain(Examples, Attribute) || Attribute <- attributes(Examples)])} of
+	{0.0, _} ->
 	    Classification;
 
+	{_, 0.0} ->
+	    [classification(Example) || Example <- Examples];
+	    
 	_ ->
 	    Attribute = highest_gain_attribute(Examples),
 	    lists:foldl(fun(Value, A) ->
@@ -73,6 +76,10 @@ highest_gain_attribute(Examples) ->
 
 classify(Attributes, Classification) ->
     #example{attributes = orddict:from_list(Attributes), classification = Classification}.
+
+
+classification(#example{classification = Classification}) ->
+    Classification.
 
 
 -spec entropy(list(#example{})) -> float().
@@ -323,5 +330,88 @@ stock_examples() ->
 
 stock_entropy_test() ->
     ?assertEqual(1.0, entropy(stock_examples())).
+
+
+adm_examples() ->
+    [quinlan_id3:classify([{macd_is_bearish_divergence, BearishDivergence},
+			   {macd_is_bullish_divergence, BullishDivergence},
+			   {macd_trigger,Trigger},
+			   {macd_value,Value},
+			   {macd_value_vs_trigger, ValueVsTrigger},
+			   {macd_value_vs_zero,ValueVsZero},
+			   {price_close, Close},
+			   {price_high, High},
+			   {price_low, Low},
+			   {price_open, Open},
+			   {price_volume, Volume}], 
+			  Decision) || {BearishDivergence,
+					BullishDivergence,
+					Trigger,
+					Value,
+					ValueVsTrigger,
+					ValueVsZero,
+					Close,
+					High,
+					Low,
+					Open,
+					Volume,
+					Decision} <-  [{true,false,falling,falling,below,below,rising,falling,rising,falling,falling, [{buy,1},{neutral,1}]},
+						       {true,false,falling,falling,below,below,rising,falling,rising,rising,falling, [{neutral,1}]},
+						       {true,false,falling,falling,below,below,rising,rising,rising,falling,falling, [{neutral,1}]},
+						       {true,false,falling,falling,below,below,rising,rising,rising,rising,falling, [{buy,1},{neutral,1}]}]].
+
+
+
+adm_entrophy_test() ->
+    ?assertEqual(1.0, entropy(adm_examples())).
+
+adm_highest_gain_test() ->
+    ?assertEqual(price_volume, highest_gain_attribute(adm_examples())).
+
+adm_highest_gain_values_test() ->
+    ?assertEqual([falling], values(adm_examples(), price_volume)).
+
+adm_highest_gain_value_subset_test() ->
+    ?assertEqual(adm_examples(), subset(adm_examples(), price_volume, falling)).
+
+adm_attributes_test() -> 
+    ?assertEqual([macd_is_bearish_divergence,
+		  macd_is_bullish_divergence, macd_trigger, macd_value,
+		  macd_value_vs_trigger, macd_value_vs_zero, price_close,
+		  price_high, price_low, price_open, price_volume],
+		 attributes(adm_examples())).
+
+adm_gain_macd_is_bearish_divergence_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), macd_is_bearish_divergence)).
+
+adm_gain_macd_is_bullish_divergence_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), macd_is_bullish_divergence)).
+
+adm_gain_macd_trigger_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), macd_trigger)).
+
+adm_gain_macd_value_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), macd_value)).
+
+adm_gain_macd_value_vs_trigger_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), macd_value_vs_trigger)).
+
+adm_gain_macd_value_vs_zero_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), macd_value_vs_zero)).
+
+adm_gain_price_close_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), price_close)).
+
+adm_gain_price_high_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), price_high)).
+
+adm_gain_price_low_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), price_low)).
+
+adm_gain_price_open_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), price_open)).
+
+adm_gain_price_volume_test() ->
+    ?assertEqual(0.0, gain(adm_examples(), price_volume)).
 
 -endif.
