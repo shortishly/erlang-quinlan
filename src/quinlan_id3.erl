@@ -1,30 +1,53 @@
 -module(quinlan_id3).
--export([tree/1, classify/2]).
+-export([tree/1, classify/2, walk/2]).
 
 -record(example, {attributes = [], classification}).
 
+-record(decision_node, {branch}).
+-record(decision_leaf, {classification}).
+-record(decision_tag, {attribute, value}).
+
+-type tree() :: #decision_node{} | #decision_leaf{}.
+
+
+-spec tree(list(#example{})) -> tree().
 tree(Examples) ->
     tree(Examples, orddict:new()).
 
 tree([#example{classification = Classification} | _] = Examples, Tree) ->
     case {entropy(Examples), lists:sum([gain(Examples, Attribute) || Attribute <- attributes(Examples)])} of
 	{0.0, _} ->
-	    Classification;
+	    #decision_leaf{classification = Classification};
 
 	{_, 0.0} ->
-	    [classification(Example) || Example <- Examples];
+	    #decision_leaf{classification = [classification(Example) || Example <- Examples]};
 	    
 	_ ->
 	    Attribute = highest_gain_attribute(Examples),
-	    lists:foldl(fun(Value, A) ->
-				orddict:store({Attribute, Value}, tree(subset(Examples, Attribute, Value)), A)
-			end,
-			Tree,
-			values(Examples, Attribute))
+	    #decision_node{branch = lists:foldl(fun(Value, A) ->
+							orddict:store(#decision_tag{attribute = Attribute, value = Value}, tree(subset(Examples, Attribute, Value)), A)
+						end,
+						Tree,
+						values(Examples, Attribute))}
 				
     end.
 
-
+walk(_, #decision_leaf{classification = Classification}) ->
+    Classification;
+walk(Example, #decision_node{branch = Branch}) ->
+    [#decision_tag{attribute = Key} | _] = orddict:fetch_keys(Branch),
+    Value = orddict:fetch(Key, Example),
+	    
+    case orddict:find(#decision_tag{attribute = Key, value = Value}, Branch) of
+	{ok, #decision_leaf{} = Leaf} ->
+	    walk(Example, Leaf);
+	
+	{ok, #decision_node{} = Node} ->
+	    walk(Example, Node);
+	
+	error ->
+	    []
+    end.
 
 
 gain(Examples, Attribute) ->

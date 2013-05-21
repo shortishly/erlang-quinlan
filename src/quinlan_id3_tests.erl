@@ -26,12 +26,12 @@ baseball_examples() ->
 						      {rain, mild, high, strong, no}]].
 
 baseball_tree_test() ->
-    ?assertEqual([{{outlook,overcast},yes},
-		  {{outlook,rain},
-		   [{{wind,strong},no},{{wind,weak},yes}]},
-		  {{outlook,sunny},
-		   [{{humidity,high},no},
-		    {{humidity,normal},yes}]}], quinlan_id3:tree(baseball_examples())).
+    Tree = quinlan_id3:tree(baseball_examples()),
+    ?assertEqual(yes, quinlan_id3:walk([{outlook, overcast}], Tree)),
+    ?assertEqual(no, quinlan_id3:walk([{outlook, rain}, {wind, strong}], Tree)),
+    ?assertEqual(yes, quinlan_id3:walk([{outlook, rain}, {wind, weak}], Tree)),
+    ?assertEqual(no, quinlan_id3:walk([{humidity, high}, {outlook, sunny}], Tree)),
+    ?assertEqual(yes, quinlan_id3:walk([{humidity, normal}, {outlook, sunny}], Tree)).
 
 sunburn_examples() ->
     [quinlan_id3:classify([{hair, Hair},
@@ -53,10 +53,11 @@ sunburn_examples() ->
 
 
 sunburn_tree_test() ->
-    ?assertEqual([{{hair,blonde},
-		   [{{lotion,no},sunburned},{{lotion,yes},none}]},
-		  {{hair,brown},none},
-		  {{hair,red},sunburned}], quinlan_id3:tree(sunburn_examples())).
+    Tree = quinlan_id3:tree(sunburn_examples()),
+    ?assertEqual(sunburned, quinlan_id3:walk([{hair, red}], Tree)),
+    ?assertEqual(none, quinlan_id3:walk([{hair, brown}], Tree)),
+    ?assertEqual(sunburned, quinlan_id3:walk([{hair, blonde}, {lotion, no}], Tree)),
+    ?assertEqual(none, quinlan_id3:walk([{hair, blonde}, {lotion, yes}], Tree)).
 
 wmh_example() ->
     [quinlan_id3:classify([{macd_is_bearish_divergence, BearishDivergence},
@@ -101,80 +102,88 @@ wmh_example() ->
 					 
 
 wmh_15_test() ->
-    ?assertEqual([{{macd_value_vs_trigger,above},sell},
-		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(15, wmh_example()))).
+    Tree = quinlan_id3:tree(lists:nthtail(15, wmh_example())),
+    ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
+    ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
 wmh_10_test() ->
-    ?assertEqual([{{macd_value_vs_trigger,above},sell},
-		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(10, wmh_example()))).
+    Tree = quinlan_id3:tree(lists:nthtail(10, wmh_example())),
+    ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
+    ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
 wmh_5_test() ->
-    ?assertEqual([{{macd_value_vs_trigger,above},sell},
-		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(5, wmh_example()))).
+    Tree = quinlan_id3:tree(lists:nthtail(5, wmh_example())),
+    ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
+    ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
+
 wmh_4_test() ->
-    ?assertEqual([{{macd_value_vs_trigger,above},sell},
-		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(4, wmh_example()))).
+    Tree = quinlan_id3:tree(lists:nthtail(4, wmh_example())),
+    ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
+    ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
 wmh_3_test() ->
-    ?assertEqual([{{macd_value_vs_trigger,above},sell},
-		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(3, wmh_example()))).
+    Tree = quinlan_id3:tree(lists:nthtail(3, wmh_example())),
+    ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
+    ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
 wmh_2_test() ->
-    ?assertEqual([{{macd_value_vs_trigger,above},[neutral,sell,sell,sell,sell,sell,sell,sell]},
-		  {{macd_value_vs_trigger,below},neutral}], quinlan_id3:tree(lists:nthtail(2, wmh_example()))).
+    Tree = quinlan_id3:tree(lists:nthtail(2, wmh_example())),
+    ?assertEqual([neutral, sell, sell, sell, sell, sell, sell, sell], quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
+    ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
 
 
 
 adm_test() ->
-    ?assertEqual([[{buy,1},{neutral,1}],
-		  [{neutral,1}],
-		  [{neutral,1}],
-		  [{buy,1},{neutral,1}]], quinlan_id3:tree([{example,[{macd_is_bearish_divergence,true},
-				{macd_is_bullish_divergence,false},
-				{macd_trigger,falling},
-				{macd_value,falling},
-				{macd_value_vs_trigger,below},
-				{macd_value_vs_zero,below},
-				{price_close,rising},
-				{price_high,falling},
-				{price_low,rising},
-				{price_open,falling},
-				{price_volume,falling}],
-		       [{buy,1},{neutral,1}]},
-		      {example,[{macd_is_bearish_divergence,true},
-				{macd_is_bullish_divergence,false},
-				{macd_trigger,falling},
-				{macd_value,falling},
-				{macd_value_vs_trigger,below},
-				{macd_value_vs_zero,below},
-				{price_close,rising},
-				{price_high,falling},
-				{price_low,rising},
-				{price_open,rising},
-				{price_volume,falling}],
-		       [{neutral,1}]},
-		      {example,[{macd_is_bearish_divergence,true},
-				{macd_is_bullish_divergence,false},
-				{macd_trigger,falling},
-				{macd_value,falling},
-				{macd_value_vs_trigger,below},
-				{macd_value_vs_zero,below},
-				{price_close,rising},
-				{price_high,rising},
-				{price_low,rising},
-				{price_open,falling},
-				{price_volume,falling}],
-		       [{neutral,1}]},
-		      {example,[{macd_is_bearish_divergence,true},
-				{macd_is_bullish_divergence,false},
-				{macd_trigger,falling},
-				{macd_value,falling},
-				{macd_value_vs_trigger,below},
-				{macd_value_vs_zero,below},
-				{price_close,rising},
-				{price_high,rising},
-				{price_low,rising},
-				{price_open,rising},
-				{price_volume,falling}],
-		       [{buy,1},{neutral,1}]}])).
+    ?assertEqual({decision_leaf, [[{buy,1},{neutral,1}],
+				  [{neutral,1}],
+				  [{neutral,1}],
+				  [{buy,1},{neutral,1}]]}, 
+		 quinlan_id3:tree([{example,[{macd_is_bearish_divergence,true},
+					     {macd_is_bullish_divergence,false},
+					     {macd_trigger,falling},
+					     {macd_value,falling},
+					     {macd_value_vs_trigger,below},
+					     {macd_value_vs_zero,below},
+					     {price_close,rising},
+					     {price_high,falling},
+					     {price_low,rising},
+					     {price_open,falling},
+					     {price_volume,falling}],
+				    [{buy,1},{neutral,1}]},
+				   {example,[{macd_is_bearish_divergence,true},
+					     {macd_is_bullish_divergence,false},
+					     {macd_trigger,falling},
+					     {macd_value,falling},
+					     {macd_value_vs_trigger,below},
+					     {macd_value_vs_zero,below},
+					     {price_close,rising},
+					     {price_high,falling},
+					     {price_low,rising},
+					     {price_open,rising},
+					     {price_volume,falling}],
+				    [{neutral,1}]},
+				   {example,[{macd_is_bearish_divergence,true},
+					     {macd_is_bullish_divergence,false},
+					     {macd_trigger,falling},
+					     {macd_value,falling},
+					     {macd_value_vs_trigger,below},
+					     {macd_value_vs_zero,below},
+					     {price_close,rising},
+					     {price_high,rising},
+					     {price_low,rising},
+					     {price_open,falling},
+					     {price_volume,falling}],
+				    [{neutral,1}]},
+				   {example,[{macd_is_bearish_divergence,true},
+					     {macd_is_bullish_divergence,false},
+					     {macd_trigger,falling},
+					     {macd_value,falling},
+					     {macd_value_vs_trigger,below},
+					     {macd_value_vs_zero,below},
+					     {price_close,rising},
+					     {price_high,rising},
+					     {price_low,rising},
+					     {price_open,rising},
+					     {price_volume,falling}],
+				    [{buy,1},{neutral,1}]}])).
