@@ -1,37 +1,9 @@
-REBAR = rebar
-DIALYZER = dialyzer
-RM = rm
+#-*- mode: makefile-gmake -*-
+PROJECT = quinlan
 
-.PHONY: all clean deps compile test ct build-plt dialyze update
+CT_SUITES = example golfing entropy wind baseball sunburn
 
-all:	clean compile test ct
+ERLC_OPTS = -DDEBUG +debug_info +warn_export_all +warn_export_vars \
+	+warn_shadow_vars +warn_obsolete_guard +bin_opt_info #+warn_missing_spec
 
-clean:
-	@$(REBAR) skip_deps=true clean
-
-squeaky: clean
-	@$(REBAR) delete-deps
-
-deps:
-	@$(REBAR) get-deps
-
-compile:
-	@$(REBAR) compile
-
-test:
-	@$(REBAR) skip_deps=true eunit
-
-ct:
-	@$(REBAR) skip_deps=true ct
-
-update:
-	@$(REBAR) update-deps
-
-
-build-plt:
-	@$(DIALYZER) --build_plt --output_plt .dialyzer.plt \
-		--apps kernel stdlib sasl inets crypto public_key ssl
-
-dialyze:
-	@$(DIALYZER) `find ebin -name "*.beam"|grep -v _test` --plt .dialyzer.plt -Werror_handling \
-		-Wrace_conditions -Wunmatched_returns -Wunderspecs -Wno_behaviours
+include erlang.mk
