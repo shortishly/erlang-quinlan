@@ -1,5 +1,32 @@
--module(quinlan_id3_tests).
+-module(example_SUITE).
+-include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
+
+-export([all/0,
+	 groups/0]).
+
+-export([baseball_tree_test/1,
+	 sunburn_tree_test/1,
+	 wmh_15_test/1,
+	 wmh_10_test/1,
+	 wmh_5_test/1,
+	 wmh_4_test/1,
+	 wmh_3_test/1,
+	 wmh_2_test/1,
+	 adm_test/1]).
+
+all() ->
+    [{group, baseball},
+     {group, sunburn},
+     {group, wmh},
+     {group, adm}].
+
+groups() ->
+    [{baseball, [parallel], [baseball_tree_test]},
+     {sunburn, [parallel], [sunburn_tree_test]},
+     {wmh, [parallel], [wmh_15_test, wmh_10_test, wmh_5_test, wmh_4_test, wmh_3_test, wmh_2_test]},
+     {adm, [parallel], [adm_test]}].
+
 
 baseball_examples() ->
     [quinlan_id3:classify([{outlook, Outlook}, 
@@ -25,7 +52,7 @@ baseball_examples() ->
 						      {overcast, hot, normal, weak, yes},
 						      {rain, mild, high, strong, no}]].
 
-baseball_tree_test() ->
+baseball_tree_test(_) ->
     Tree = quinlan_id3:tree(baseball_examples()),
     ?assertEqual(yes, quinlan_id3:walk([{outlook, overcast}], Tree)),
     ?assertEqual(no, quinlan_id3:walk([{outlook, rain}, {wind, strong}], Tree)),
@@ -52,7 +79,7 @@ sunburn_examples() ->
 						  {blonde, short, light, yes, none}]].
 
 
-sunburn_tree_test() ->
+sunburn_tree_test(_) ->
     Tree = quinlan_id3:tree(sunburn_examples()),
     ?assertEqual(sunburned, quinlan_id3:walk([{hair, red}], Tree)),
     ?assertEqual(none, quinlan_id3:walk([{hair, brown}], Tree)),
@@ -101,32 +128,32 @@ wmh_example() ->
 						       {false,false,rising,rising,below,above,rising,rising,rising,rising,rising,neutral}]].
 					 
 
-wmh_15_test() ->
+wmh_15_test(_) ->
     Tree = quinlan_id3:tree(lists:nthtail(15, wmh_example())),
     ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
     ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
-wmh_10_test() ->
+wmh_10_test(_) ->
     Tree = quinlan_id3:tree(lists:nthtail(10, wmh_example())),
     ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
     ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
-wmh_5_test() ->
+wmh_5_test(_) ->
     Tree = quinlan_id3:tree(lists:nthtail(5, wmh_example())),
     ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
     ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
-wmh_4_test() ->
+wmh_4_test(_) ->
     Tree = quinlan_id3:tree(lists:nthtail(4, wmh_example())),
     ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
     ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
-wmh_3_test() ->
+wmh_3_test(_) ->
     Tree = quinlan_id3:tree(lists:nthtail(3, wmh_example())),
     ?assertEqual(sell, quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
     ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
 
-wmh_2_test() ->
+wmh_2_test(_) ->
     Tree = quinlan_id3:tree(lists:nthtail(2, wmh_example())),
     ?assertEqual([neutral, sell, sell, sell, sell, sell, sell, sell], quinlan_id3:walk([{macd_value_vs_trigger, above}], Tree)),
     ?assertEqual(neutral, quinlan_id3:walk([{macd_value_vs_trigger, below}], Tree)).
@@ -134,7 +161,7 @@ wmh_2_test() ->
 
 
 
-adm_test() ->
+adm_test(_) ->
     ?assertEqual({decision_leaf, [[{buy,1},{neutral,1}],
 				  [{neutral,1}],
 				  [{neutral,1}],

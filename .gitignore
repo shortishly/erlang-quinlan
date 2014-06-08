@@ -6,3 +6,4 @@ logs
 deps
 *.beam
 .eunit
+ebin/*

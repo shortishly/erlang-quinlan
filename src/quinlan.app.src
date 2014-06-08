@@ -1,8 +1,9 @@
 {application, quinlan,
  [
-  {description, ""},
+  {description, "0.0.1"},
   {vsn, "1"},
   {registered, []},
+  {modules,[]},
   {applications, [
                   kernel,
                   stdlib
