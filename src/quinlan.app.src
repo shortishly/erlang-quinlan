@@ -1,7 +1,8 @@
+%%-*- mode: erlang -*-
 {application, quinlan,
  [
-  {description, "0.0.1"},
-  {vsn, "1"},
+  {description, "ML Decision Trees"},
+  {vsn, "0.0.1"},
   {registered, []},
   {modules,[]},
   {applications, [

@@ -1,30 +1,40 @@
+%% Copyright (c) 2013-2014 Peter Morgan <peter.james.morgan@gmail.com>
+%%
+%% Licensed under the Apache License, Version 2.0 (the "License");
+%% you may not use this file except in compliance with the License.
+%% You may obtain a copy of the License at
+%%
+%% http://www.apache.org/licenses/LICENSE-2.0
+%%
+%% Unless required by applicable law or agreed to in writing, software
+%% distributed under the License is distributed on an "AS IS" BASIS,
+%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%% See the License for the specific language governing permissions and
+%% limitations under the License.
+
 -module(ipcam_SUITE).
 -include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
 
--export([all/0]).
-
--export([highest_gain_attribute_test/1, upgrade_htmls_ok_entropy_test/1]).
-
--import(quinlan_id3, [classify/2, entropy/1, subset/3, highest_gain_attribute/1]).
+-compile(export_all).
 
 all() ->
-    [highest_gain_attribute_test,
-     upgrade_htmls_ok_entropy_test].
+    common:all().
 
+groups() ->
+    common:groups(?MODULE).
 
 
 highest_gain_attribute_test(Config) ->
-    ?assertEqual(<<"upgrade_htmls.cgi">>, highest_gain_attribute(cameras(Config))).
+    <<"upgrade_htmls.cgi">> = quinlan_id3:highest_gain_attribute(cameras(Config)).
 
 upgrade_htmls_ok_entropy_test(Config) ->
-    ?assertEqual(0.0, entropy(subset(cameras(Config), <<"upgrade_htmls.cgi">>, ok))).
+    0.0 = quinlan_id3:entropy(quinlan_id3:subset(cameras(Config), <<"upgrade_htmls.cgi">>, ok)).
 
 
 cameras(Config) ->
-    [classify(tenvis_jpt3815w_2013(Config), tenvis), 
-     classify(foscam_f18906w(Config), foscam),
-     classify(loftek_nexus_543(Config), foscam)].
+    [quinlan_id3:classify(tenvis_jpt3815w_2013(Config), tenvis), 
+     quinlan_id3:classify(foscam_f18906w(Config), foscam),
+     quinlan_id3:classify(loftek_nexus_543(Config), foscam)].
 
 
 loftek_nexus_543(Config) ->

@@ -1,54 +1,55 @@
+%% Copyright (c) 2013-2014 Peter Morgan <peter.james.morgan@gmail.com>
+%%
+%% Licensed under the Apache License, Version 2.0 (the "License");
+%% you may not use this file except in compliance with the License.
+%% You may obtain a copy of the License at
+%%
+%% http://www.apache.org/licenses/LICENSE-2.0
+%%
+%% Unless required by applicable law or agreed to in writing, software
+%% distributed under the License is distributed on an "AS IS" BASIS,
+%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%% See the License for the specific language governing permissions and
+%% limitations under the License.
+
 -module(sunburn_SUITE).
 -include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
 
--export([all/0]).
+-compile(export_all).
 
--export([sunburn_highest_gain_attribute_test/1,
-	 sunburn_with_hair_blonde_test/1,
-	 sunburn_with_hair_red_test/1,
-	 sunburn_with_hair_brown_test/1]).
-
--import(quinlan_id3, [classify/2, entropy/1, subset/3, highest_gain_attribute/1]).
 
 all() ->
-    [sunburn_highest_gain_attribute_test,
-     sunburn_with_hair_blonde_test,
-     sunburn_with_hair_red_test,
-     sunburn_with_hair_brown_test].
+    common:all().
 
-sunburn_examples() ->
-    [classify([{hair, Hair},
-	       {height, Height},
-	       {weight, Weight},
-	       {lotion, Lotion}],
-	      Result) || {Hair,
-			  Height,
-			  Weight,
-			  Lotion,
-			  Result} <- [{blonde, average, light, no, sunburned},
-				      {blonde, tall, average, yes, none},
-				      {brown, short, average, yes, none},
-				      {blonde, short, average, no, sunburned},
-				      {red, average, heavy, no, sunburned},
-				      {brown, tall, heavy, no, none},
-				      {brown, average, heavy, no, none},
-				      {blonde, short, light, yes, none}]].
+groups() ->
+    common:groups(?MODULE).
+
+init_per_suite(Config) ->
+    common:init_per_suite(Config).
+
+examples(Config) ->
+    common:examples(Config).
 
 
-sunburn_highest_gain_attribute_test(_) ->
-    ?assertEqual(hair, highest_gain_attribute(sunburn_examples())).
+sunburn_highest_gain_attribute_test(Config) ->
+    hair = quinlan_id3:highest_gain_attribute(examples(Config)).
 
-sunburn_with_hair_blonde_test(_) ->
-    Blonde = subset(sunburn_examples(), hair, blonde),
-    ?assertEqual(1.0, entropy(Blonde)),
-    ?assertEqual(lotion, highest_gain_attribute(subset(sunburn_examples(), hair, blonde))).
+sunburn_with_hair_blonde_test(Config) ->
+    Blonde = quinlan_id3:subset(examples(Config), hair, blonde),
+    1.0 = quinlan_id3:entropy(Blonde),
+    lotion = quinlan_id3:highest_gain_attribute(quinlan_id3:subset(examples(Config), hair, blonde)).
 
-sunburn_with_hair_red_test(_) ->
-    Red = subset(sunburn_examples(), hair, red),
-    ?assertEqual(0.0, entropy(Red)).
+sunburn_with_hair_red_test(Config) ->
+    Red = quinlan_id3:subset(examples(Config), hair, red),
+    0.0 = quinlan_id3:entropy(Red).
 
-sunburn_with_hair_brown_test(_) ->
-    Brown = subset(sunburn_examples(), hair, brown),
-    ?assertEqual(0.0, entropy(Brown)).
+sunburn_with_hair_brown_test(Config) ->
+    Brown = quinlan_id3:subset(examples(Config), hair, brown),
+    0.0 = quinlan_id3:entropy(Brown).
 
+sunburn_tree_test(Config) ->
+    Tree = quinlan_id3:tree(examples(Config)),
+    sunburned = quinlan_id3:walk([{hair, red}], Tree),
+    none = quinlan_id3:walk([{hair, brown}], Tree),
+    sunburned = quinlan_id3:walk([{hair, blonde}, {lotion, no}], Tree),
+    none = quinlan_id3:walk([{hair, blonde}, {lotion, yes}], Tree).

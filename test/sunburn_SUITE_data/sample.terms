@@ -1,0 +1,12 @@
+%%-*- mode: erlang -*-
+%%
+%% Sample data from http://www2.cs.uregina.ca/~dbd/cs831/notes/ml/dtrees/c4.5/c4.5_prob2.html
+
+{[{hair, blonde}, {height, average}, {weight, light}, {lotion, no}], sunburned}.
+{[{hair, blonde}, {height, tall}, {weight, average}, {lotion, yes}], none}.
+{[{hair, brown}, {height, short}, {weight, average}, {lotion, yes}], none}.
+{[{hair, blonde}, {height, short}, {weight, average}, {lotion, no}], sunburned}.
+{[{hair, red}, {height, average}, {weight, heavy}, {lotion, no}], sunburned}.
+{[{hair, brown}, {height, tall}, {weight, heavy}, {lotion, no}], none}.
+{[{hair, brown}, {height, average}, {weight, heavy}, {lotion, no}], none}.
+{[{hair, blonde}, {height, short}, {weight, light}, {lotion, yes}], none}.
