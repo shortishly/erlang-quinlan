@@ -1,105 +1,83 @@
+%% Copyright (c) 2013-2014 Peter Morgan <peter.james.morgan@gmail.com>
+%%
+%% Licensed under the Apache License, Version 2.0 (the "License");
+%% you may not use this file except in compliance with the License.
+%% You may obtain a copy of the License at
+%%
+%% http://www.apache.org/licenses/LICENSE-2.0
+%%
+%% Unless required by applicable law or agreed to in writing, software
+%% distributed under the License is distributed on an "AS IS" BASIS,
+%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%% See the License for the specific language governing permissions and
+%% limitations under the License.
+
 -module(baseball_SUITE).
 -include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
 
--export([all/0]).
+-compile(export_all).
 
--export([baseball_attributes_test/1,
-	 baseball_entropy_test/1,
-	 baseball_gain_outlook_test/1,
-	 baseball_gain_temperature_test/1,
-	 baseball_gain_humidity_test/1,
-	 baseball_gain_wind_test/1,
-	 baseball_outlook_sunny_gain_humidity_test/1,
-	 baseball_outlook_sunny_gain_temperature_test/1,
-	 baseball_outlook_wind_gain_temperature_test/1,
-	 baseball_highest_gain_attribute_test/1,
-	 baseball_highest_gain_attribute_with_outlook_rain_test/1,
-	 baseball_highest_gain_attribute_with_outlook_sunny_test/1]).
-
--import(quinlan_id3, [classify/2, gain/2, entropy/1, subset/3, attributes/1, highest_gain_attribute/1]).
 
 all() ->
-    [baseball_attributes_test,
-     baseball_entropy_test,
-     baseball_gain_outlook_test,
-     baseball_gain_temperature_test,
-     baseball_gain_humidity_test,
-     baseball_gain_wind_test,
-     baseball_outlook_sunny_gain_humidity_test,
-     baseball_outlook_sunny_gain_temperature_test,
-     baseball_outlook_wind_gain_temperature_test,
-     baseball_highest_gain_attribute_test,
-     baseball_highest_gain_attribute_with_outlook_rain_test,
-     baseball_highest_gain_attribute_with_outlook_sunny_test].
+    common:all().
+
+groups() ->
+    common:groups(?MODULE).
+
+init_per_suite(Config) ->
+    common:init_per_suite(Config).
+
+examples(Config) ->
+    common:examples(Config).
+
+outlook_sunny_examples(Config) ->
+    quinlan_id3:subset(examples(Config), outlook, sunny).
 
 
-%%
-%% Baseball examples
-%%
-baseball_examples() ->
-    [classify([{outlook, Outlook}, 
-	       {temperature, Temperature}, 
-	       {humidity, Humidity}, 
-	       {wind, Wind}],
-	      PlayBall) || {Outlook, 
-			    Temperature, 
-			    Humidity, 
-			    Wind, 
-			    PlayBall} <- [{sunny, hot, high, weak, no},
-					  {sunny, hot, high, strong, no},
-					  {overcast, hot, high, weak, yes},
-					  {rain, mild, high, weak, yes},
-					  {rain, cool, normal, weak, yes},
-					  {rain, cool, normal, strong, no},
-					  {overcast, cool, normal, strong, yes},
-					  {sunny, mild, high, weak, no},
-					  {sunny, cool, normal, weak, yes},
-					  {rain, mild, normal, weak, yes},
-					  {sunny, mild, normal, strong, yes},
-					  {overcast, mild, high, strong, yes},
-					  {overcast, hot, normal, weak, yes},
-					  {rain, mild, high, strong, no}]].
+attributes_test(Config) ->
+    [humidity, outlook, temperature, wind] = quinlan_id3:attributes(examples(Config)).
 
-baseball_attributes_test(_) ->
-    ?assertEqual([humidity, outlook, temperature, wind], attributes(baseball_examples())).
+entropy_test(Config) ->
+    0.9402859586706309 = quinlan_id3:entropy(examples(Config)).
 
-baseball_entropy_test(_) ->
-    ?assertEqual(0.9402859586706309, entropy(baseball_examples())).
+gain_outlook_test(Config) ->
+    0.2467498197744391 = quinlan_id3:gain(examples(Config), outlook).
 
-baseball_gain_outlook_test(_) ->
-    ?assertEqual(0.2467498197744391, gain(baseball_examples(), outlook)).
+gain_temperature_test(Config) ->
+    0.029222565658954647 = quinlan_id3:gain(examples(Config), temperature).
 
-baseball_gain_temperature_test(_) ->
-    ?assertEqual(0.029222565658954647, gain(baseball_examples(), temperature)).
+gain_humidity_test(Config) ->
+    0.15183550136234136 = quinlan_id3:gain(examples(Config), humidity).
 
-baseball_gain_humidity_test(_) ->
-    ?assertEqual(0.15183550136234136, gain(baseball_examples(), humidity)).
+gain_wind_test(Config) ->
+    0.04812703040826927 = quinlan_id3:gain(examples(Config), wind).
 
-baseball_gain_wind_test(_) ->
-    ?assertEqual(0.04812703040826927, gain(baseball_examples(), wind)).
 
-baseball_outlook_sunny_examples() ->
-    subset(baseball_examples(), outlook, sunny).
+outlook_sunny_gain_humidity_test(Config) ->
+    0.9709505944546686 = quinlan_id3:gain(outlook_sunny_examples(Config), humidity).
 
-baseball_outlook_sunny_gain_humidity_test(_) ->
-    ?assertEqual(0.9709505944546686, gain(baseball_outlook_sunny_examples(), humidity)).
+outlook_sunny_gain_temperature_test(Config) ->
+    0.5709505944546686 = quinlan_id3:gain(outlook_sunny_examples(Config), temperature).
 
-baseball_outlook_sunny_gain_temperature_test(_) ->
-    ?assertEqual(0.5709505944546686, gain(baseball_outlook_sunny_examples(), temperature)).
-
-baseball_outlook_wind_gain_temperature_test(_) ->
-    ?assertEqual(0.01997309402197489, gain(baseball_outlook_sunny_examples(), wind)).
+outlook_wind_gain_temperature_test(Config) ->
+    0.01997309402197489 = quinlan_id3:gain(outlook_sunny_examples(Config), wind).
 
 
 
-baseball_highest_gain_attribute_test(_) ->
-    ?assertEqual(outlook, highest_gain_attribute(baseball_examples())).
+highest_gain_attribute_test(Config) ->
+    outlook = quinlan_id3:highest_gain_attribute(examples(Config)).
 
-baseball_highest_gain_attribute_with_outlook_rain_test(_) ->
-    ?assertEqual(wind, highest_gain_attribute(subset(baseball_examples(), outlook, rain))).
+highest_gain_attribute_with_outlook_rain_test(Config) ->
+    wind = quinlan_id3:highest_gain_attribute(quinlan_id3:subset(examples(Config), outlook, rain)).
 
-baseball_highest_gain_attribute_with_outlook_sunny_test(_) ->
-    ?assertEqual(humidity, highest_gain_attribute(subset(baseball_examples(), outlook, sunny))).
+highest_gain_attribute_with_outlook_sunny_test(Config) ->
+    humidity = quinlan_id3:highest_gain_attribute(quinlan_id3:subset(examples(Config), outlook, sunny)).
 
 
+tree_walk_test(Config) ->
+    Tree = quinlan_id3:tree(examples(Config)),
+    yes = quinlan_id3:walk([{outlook, overcast}], Tree),
+    no = quinlan_id3:walk([{outlook, rain}, {wind, strong}], Tree),
+    yes = quinlan_id3:walk([{outlook, rain}, {wind, weak}], Tree),
+    no = quinlan_id3:walk([{humidity, high}, {outlook, sunny}], Tree),
+    yes = quinlan_id3:walk([{humidity, normal}, {outlook, sunny}], Tree).

@@ -1,0 +1,19 @@
+%%-*- mode: erlang -*-
+%%
+%% Baseball example data from http://www.cise.ufl.edu/~ddd/cap6635/Fall-97/Short-papers/2.htm
+%%
+
+{[{outlook, sunny}, {temperature, hot}, {humidity, high}, {wind, weak}], no}.
+{[{outlook, sunny}, {temperature, hot}, {humidity, high}, {wind, strong}], no}.
+{[{outlook, overcast}, {temperature, hot}, {humidity, high}, {wind, weak}], yes}.
+{[{outlook, rain}, {temperature, mild}, {humidity, high}, {wind, weak}], yes}.
+{[{outlook, rain}, {temperature, cool}, {humidity, normal}, {wind, weak}], yes}.
+{[{outlook, rain}, {temperature, cool}, {humidity, normal}, {wind, strong}], no}.
+{[{outlook, overcast}, {temperature, cool}, {humidity, normal}, {wind, strong}], yes}.
+{[{outlook, sunny}, {temperature, mild}, {humidity, high}, {wind, weak}], no}.
+{[{outlook, sunny}, {temperature, cool}, {humidity, normal}, {wind, weak}], yes}.
+{[{outlook, rain}, {temperature, mild}, {humidity, normal}, {wind, weak}], yes}.
+{[{outlook, sunny}, {temperature, mild}, {humidity, normal}, {wind, strong}], yes}.
+{[{outlook, overcast}, {temperature, mild}, {humidity, high}, {wind, strong}], yes}.
+{[{outlook, overcast}, {temperature, hot}, {humidity, normal}, {wind, weak}], yes}.
+{[{outlook, rain}, {temperature, mild}, {humidity, high}, {wind, strong}], no}.

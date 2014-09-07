@@ -1,0 +1,18 @@
+%%-*- mode: erlang -*-
+%%
+%% Sample data from http://www.cis.temple.edu/~giorgio/cis587/readings/id3-c45.html
+
+{[{outlook, sunny},    {temperature, 85}, {humidity, 85}, {windy, false}], dont_play}.
+{[{outlook, sunny},    {temperature, 80}, {humidity, 90}, {windy, true}], dont_play}.
+{[{outlook, overcast}, {temperature, 83}, {humidity, 78}, {windy, false}], play}.
+{[{outlook, rain},     {temperature, 70}, {humidity, 96}, {windy, false}], play}.
+{[{outlook, rain},     {temperature, 68}, {humidity, 80}, {windy, false}], play}.
+{[{outlook, rain},     {temperature, 65}, {humidity, 70}, {windy, true}], dont_play}.
+{[{outlook, overcast}, {temperature, 64}, {humidity, 65}, {windy, true}], play}.
+{[{outlook, sunny},    {temperature, 72}, {humidity, 95}, {windy, false}], dont_play}.
+{[{outlook, sunny},    {temperature, 69}, {humidity, 70}, {windy, false}], play}.
+{[{outlook, rain},     {temperature, 75}, {humidity, 80}, {windy, false}], play}.
+{[{outlook, sunny},    {temperature, 75}, {humidity, 70}, {windy, true}], play}.
+{[{outlook, overcast}, {temperature, 72}, {humidity, 90}, {windy, true}], play}.
+{[{outlook, overcast}, {temperature, 81}, {humidity, 75}, {windy, false}], play}.
+{[{outlook, rain},     {temperature, 71}, {humidity, 80}, {windy, true}], dont_play}.

@@ -1,39 +1,45 @@
+%% Copyright (c) 2013-2014 Peter Morgan <peter.james.morgan@gmail.com>
+%%
+%% Licensed under the Apache License, Version 2.0 (the "License");
+%% you may not use this file except in compliance with the License.
+%% You may obtain a copy of the License at
+%%
+%% http://www.apache.org/licenses/LICENSE-2.0
+%%
+%% Unless required by applicable law or agreed to in writing, software
+%% distributed under the License is distributed on an "AS IS" BASIS,
+%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%% See the License for the specific language governing permissions and
+%% limitations under the License.
+
 -module(entropy_SUITE).
 -include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
 
--export([all/0,
-	 groups/0]).
+-compile(export_all).
 
--export([entropy_test/1,
-	 entropy_perfectly_classified_test/1, 
-	 entropy_totally_random_test/1]).
-
--import(quinlan_id3, [classify/2,
-		      entropy/1]).
 
 all() ->
-    [{group, entropy}].
+    common:all().
 
 groups() ->
-    [{entropy, [parallel], [entropy_test, entropy_perfectly_classified_test, entropy_totally_random_test]}].
+    common:groups(?MODULE).
 
 
 n(N, X) ->
     lists:map(fun(_) -> X end, lists:seq(1, N)).
 
 entropy_test(_) ->
-    Yes = classify([], yes),
-    No = classify([], no),
-    ?assertEqual(0.9402859586706309, entropy(n(9, Yes) ++ n(5, No))).
+    Yes = quinlan_id3:classify([], yes),
+    No = quinlan_id3:classify([], no),
+    0.9402859586706309 = quinlan_id3:entropy(n(9, Yes) ++ n(5, No)).
 
 entropy_perfectly_classified_test(_) ->
-    Yes = classify([], yes),
-    ?assertEqual(0.0, entropy([Yes])),
-    ?assertEqual(0.0, entropy([Yes, Yes])).
+    Yes = quinlan_id3:classify([], yes),
+    0.0 = quinlan_id3:entropy([Yes]),
+    0.0 = quinlan_id3:entropy([Yes, Yes]).
 
 entropy_totally_random_test(_) ->
-    Yes = classify([], yes),
-    No = classify([], no),
-    ?assertEqual(1.0, entropy([Yes, No])).
+    Yes = quinlan_id3:classify([], yes),
+    No = quinlan_id3:classify([], no),
+    1.0 = quinlan_id3:entropy([Yes, No]).
 
