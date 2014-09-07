@@ -10,6 +10,9 @@ resulting tree may then be used to classify future samples.
 
 Uses [erlang.mk](https://github.com/ninenines/erlang.mk). To build run `make`.
 
+[![Build Status](https://travis-ci.org/shortishly/erlang-quinlan.svg)](https://travis-ci.org/shortishly/erlang-quinlan)
+
+
 ## Usage
 
 Examples are key value pairs that are classified.
